@@ -1,5 +1,6 @@
 /*global chrome,document,window */
-(function init(angular) {
+(function(angular) {
+var init = function() {
     "use strict";
     try {
         chrome.storage.local.get(["url", "tab.selected", "always-tab-update"], function (items) {
@@ -28,4 +29,9 @@
         console.error(e);
         angular.resumeBootstrap();
     }
+};
+chrome.runtime.sendMessage({msg: 'checkEnabled'}, function(response) {
+    if (response.enabled) init();
+    else document.title = '(' + response.error + ')';
+});
 })(angular);

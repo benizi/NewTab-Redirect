@@ -3,6 +3,7 @@
 var slice = Array.prototype.slice;
 var manifest = chrome.runtime.getManifest();
 var allOptions = ["usingStorageApi", "url", "syncOptions", "lastInstall", "showWelcome", "upgrade_3.1", "always-tab-update"];
+var enabled = false;
 
 function log(){
     var args = slice.call(arguments);
@@ -16,6 +17,16 @@ function log(){
 
 function init() {
     log("background.js: init()");
+    var delay = 2; // in seconds
+    setTimeout(function() { enabled = true }, delay * 1000);
+    chrome.runtime.onMessage.addListener(function(req, _, respond) {
+        if (req.msg === 'checkEnabled') {
+            var data = {enabled: enabled};
+            if (!enabled) data.error = 'no redirect in first ' + delay + 'sec';
+            respond(data);
+            return true;
+        }
+    });
 }
 
 function saveInitial() {
